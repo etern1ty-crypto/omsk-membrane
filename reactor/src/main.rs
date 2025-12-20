@@ -12,14 +12,7 @@ fn main() {
     // 1. Allocate Shared Memory (Simulated for this stage via Heap, ideally shm_open)
     // We abide by the 128-byte alignment rule of SynapseHeader.
     // In a real run this would be: let shm = Guest::new(4096)...
-    let header = Arc::new(SynapseHeader {
-        head: std::sync::atomic::AtomicU32::new(0),
-        host_state: 1,
-        _pad_producer: [0; 120],
-        tail: std::sync::atomic::AtomicU32::new(0),
-        guest_fault: 0,
-        _pad_consumer: [0; 120],
-    });
+    let header = Arc::new(SynapseHeader::new());
 
     println!("[OMSK] LAYER II: ACTIVE (Address: {:p})", header);
     println!("[OMSK] LAYER III: ACTIVE");

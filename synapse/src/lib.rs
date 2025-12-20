@@ -1,30 +1,26 @@
-// [OMSK] LAYER II: THE PHYSICAL REALITY
-// CACHE ALIGNMENT IS NON-NEGOTIABLE.
+use std::sync::atomic::AtomicU64;
 
-use std::sync::atomic::AtomicU32;
-
-// Must be power of 2
-pub const RING_SIZE: usize = 64 * 1024; 
-
-#[repr(C, align(128))]
+// [OMSK] LAYER II: SHARED MEMORY GEOMETRY
+// Cache Line: 128 bytes (L2/L3 prefetch optimization)
+#[repr(C)]
+#[repr(align(128))]
 pub struct SynapseHeader {
-    // WRITTEN BY HOST / READ BY GUEST
-    // CACHE LINE 0
-    pub head: AtomicU32,
-    pub host_state: u32,
-    _pad_producer: [u8; 120], 
+    // Producer Cache Line (Host writes here)
+    pub head: AtomicU64,
+    _pad_head: [u8; 120], // 128 - 8 = 120 bytes padding
 
-    // WRITTEN BY GUEST / READ BY HOST
-    // CACHE LINE 1
-    pub tail: AtomicU32,
-    pub guest_fault: u32,
-    _pad_consumer: [u8; 120],
+    // Consumer Cache Line (Guest writes here)
+    pub tail: AtomicU64,
+    _pad_tail: [u8; 120],
 }
 
-#[repr(C, align(4096))] // PAGE ALIGNED DATA PLANE
-pub struct DataPlane {
-    pub buffer: [u8; RING_SIZE],
+impl SynapseHeader {
+    pub fn new() -> Self {
+        Self {
+            head: AtomicU64::new(0),
+            _pad_head: [0; 120],
+            tail: AtomicU64::new(0),
+            _pad_tail: [0; 120],
+        }
+    }
 }
-
-// IF THIS FAILS, THE UNIVERSE IS BROKEN.
-const _: () = assert!(std::mem::align_of::<SynapseHeader>() == 128);

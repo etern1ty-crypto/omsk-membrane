@@ -1,1 +1,1 @@
-D:\megaproj\omsk-membrane\target\release\libsynapse.rlib: D:\megaproj\omsk-membrane\synapse\src\lib.rs
+/usr/src/omsk/target/release/libsynapse.rlib: /usr/src/omsk/synapse/src/lib.rs

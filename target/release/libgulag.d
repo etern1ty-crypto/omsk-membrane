@@ -1,1 +1,1 @@
-D:\megaproj\omsk-membrane\target\release\libgulag.rlib: D:\megaproj\omsk-membrane\gulag\src\lib.rs
+/usr/src/omsk/target/release/libgulag.rlib: /usr/src/omsk/gulag/src/lib.rs
