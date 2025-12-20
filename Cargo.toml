@@ -1,0 +1,12 @@
+[workspace]
+members = [
+    "synapse",
+    "gulag",
+    "reactor"
+]
+resolver = "2"
+
+[profile.release]
+lto = "fat"           # Link Time Optimization: MANDATORY.
+codegen-units = 1     # Slower compile, faster code.
+panic = "abort"       # No unwinding. If we fail, we die immediately.

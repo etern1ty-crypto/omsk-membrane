@@ -1,0 +1,11 @@
+[package]
+name = "reactor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+synapse = { path = "../synapse" }
+gulag = { path = "../gulag" }
+libc = "0.2"
+memmap2 = "0.9"
+
