@@ -1,4 +1,4 @@
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1a1b27,50:E74C3C,100:1a1b27&height=200&section=header&text=OMSK%20MEMBRANE&fontSize=50&fontColor=FFFFFF&fontAlignY=35&desc=Hardened%20Virtual%20Membrane%20%E2%80%94%20Zero-Syscall%20Architecture&descSize=16&descColor=F5B7B1&descAlignY=55&animation=fadeIn" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1a1b27,50:E74C3C,100:1a1b27&height=200&section=header&text=OMSK%20MEMBRANE&fontSize=50&fontColor=FFFFFF&fontAlignY=35&desc=Hardened%20Virtual%20Membrane%20--%20Zero-Syscall%20Architecture&descSize=16&descColor=F5B7B1&descAlignY=55&animation=fadeIn" width="100%"/>
 
 <div align="center">
 
