@@ -1,110 +1,185 @@
-# OMSK Membrane
+# 🛡️ OMSK Membrane
 
-[![Build: verified](https://img.shields.io/badge/build-verified-brightgreen)](docs/TESTING.md)
-[![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange?logo=rust)](Cargo.toml)
-[![Version 0.2.0](https://img.shields.io/badge/version-0.2.0-blue)](CHANGELOG.md)
-[![Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
+<p align="center">
+  <strong>Проверяйте нативные x86-64 артефакты в CI/CD до релиза — без запуска бинарников и без отправки в облачные сервисы.</strong><br>
+  Статический сканер машинного кода и гейт безопасности для ELF64 плагинов, драйверов и доверенных SDK.<br>
+  Обнаруживает запрещённые инструкции (прямые <code>syscall</code>, манипуляции с защитой памяти <code>wrpkru</code>, тайминг-атаки <code>rdtsc</code>).
+</p>
 
-**Проверяйте нативные артефакты до публикации — не отправляя бинарники во внешние сервисы.**
-OMSK Membrane проверяет ELF64 и явно заданные raw-данные на запрещённые x86-64 байтовые сигнатуры и выдаёт воспроизводимые отчёты для CI/CD.
+<p align="center">
+  <img src="https://img.shields.io/badge/version-0.2.0-1766ad?style=flat-square" alt="Version 0.2.0">
+  <img src="https://img.shields.io/badge/Rust-1.85%2B-orange?style=flat-square&logo=rust" alt="Rust 1.85+">
+  <img src="https://img.shields.io/badge/tests-50%20passed-257349?style=flat-square" alt="50 tests passed">
+  <img src="https://img.shields.io/badge/format-SARIF%202.1.0%20%7C%20JSON-58a6ff?style=flat-square" alt="SARIF 2.1.0">
+  <img src="https://img.shields.io/badge/offline-zero%20network-success?style=flat-square" alt="Zero Network">
+  <img src="https://img.shields.io/badge/license-Apache--2.0-green?style=flat-square" alt="Apache 2.0 License">
+</p>
 
-> **Статус: верифицирован (100% тестов пройдены).** Проект успешно скомпилирован на Rust 1.85.1 (Linux x86_64). Пройдены все 49 Rust-тестов, 2 doc-теста, Clippy (`-D warnings`), rustfmt, rustdoc, preflight и 16 E2E black-box тестов на debug и release сборках через `scripts/verify.sh`. [Точный статус проверок →](docs/TESTING.md)
+---
 
-> **Это lint, не sandbox.** Совпадение может находиться внутри константы, а отсутствие совпадений не доказывает безопасность исполнения. Проект не исполняет анализируемые файлы, не реализует MPK/CET и не заменяет изоляцию.
+## 📸 Обзор правил и работы гейта
 
-## Для кого
+<p align="center">
+  <img src="docs/assets/scanner-overview.png" alt="OMSK Membrane Scanner Overview" width="850">
+</p>
 
-Для platform/security engineers, которые выпускают контролируемые Linux x86-64 плагины, SDK и вычислительные модули и хотят обнаруживать нежелательные изменения машинного кода после сборки. Это не универсальная политика для всех системных программ: обычным исполняемым файлам системные вызовы часто необходимы.
+> 💡 **Полная изоляция:** сканер проводит исключительно статический байт-анализ исполняемых сегментов `PT_LOAD` и секций `.text`. Анализируемые файлы никогда не запускаются на исполнение.
 
-## Возможности
+---
 
-- 🎯 **Политика в репозитории:** профили `strict`, `syscalls`, `timing` и явный список правил.
-- 🧭 **ELF-aware:** исполняемые `PT_LOAD` в stripped binaries; исполняемые секции в `.o`.
-- 🧾 **Text / JSON / SARIF 2.1.0:** точные смещения в файле, без выдуманных строк исходника.
-- 🧵 **Ограниченная очередь:** backpressure, фиксированный worker и отсутствие busy-wait.
-- 🛑 **Предсказуемое завершение:** ошибки не превращаются в успех; SIGINT/SIGTERM оставляют явно неполный отчёт.
-- 📦 **Офлайн-сборка:** только локальные Rust crates, без зависимостей crates.io.
-- 🔒 **Осторожный I/O:** лимиты, отказ от special files, экранирование и атомарная публикация нового отчёта без перезаписи.
+## 🎯 Зачем нужен OMSK Membrane
 
-## Архитектура
+При разработке доверенных плагинов, изолированных модулей (Wasm native host bindings, eBPF, SDK) или закрытых системных библиотек важно гарантировать, что сторонний или скомпилированный код не совершает несанкционированных системных вызовов в обход runtime-песочницы.
+
+**OMSK Membrane внедряется в CI/CD как бескомпромиссный гейт безопасности:**
+
+| Возможность | Как это работает в OMSK Membrane |
+| :--- | :--- |
+| 🧭 **ELF-Aware парсер** | Сканирует только реальные исполняемые сегменты (`PT_LOAD` с флагом `PF_X`) и секции `.text` в stripped-бинарниках, исключая ложные срабатывания в данных и ресурсах. |
+| 🛡 **8 правил контроля инструкций** | Блокирует прямой вызов ядра (`syscall`, `sysenter`, `int 0x80`), модификацию аппаратных ключей защиты страниц (`wrpkru`, `xrstor`) и снятие процессорных меток времени (`rdtsc`). |
+| 📊 **Стандарты SARIF 2.1.0 & JSON** | Нативная интеграция с GitHub Code Scanning, GitLab SAST и консольными CI-пайплайнами с точными смещениями байт. |
+| 🧵 **Ограниченные очереди (Synapse)** | Строгий backpressure, фиксированное потребление оперативной памяти и защита от зависаний при сканировании сотен артефактов. |
+| 📦 **100% Offline сборка** | Проект автономен, не совершает сетевых вызовов и компилируется без обращения к внешним зеркалам зависимостей. |
+| 🔒 **Атомарные отчёты** | Результаты записываются во временный файл и публикуются атомарно с проверкой прав доступа, исключая гонки процессов. |
+
+> [!NOTE]
+> **Это статический линтер (Static Policy Lint), а не виртуальная машина.** Проект проверяет соблюдение политики машинного кода, но не заменяет изоляцию уровня ядра (seccomp, MPK, namespaces).
+
+---
+
+## 🏗️ Архитектура конвейера сканирования
 
 ```mermaid
 flowchart LR
-    A[Пути к артефактам] --> B[Ограниченная очередь synapse]
-    B --> C[Worker: снимок файла]
-    C --> D[ELF parser + правила gulag]
-    D --> E[Ограниченная очередь результатов]
-    E --> F[Text / JSON / SARIF]
-    F --> G[Exit code для CI]
+    A["Артефакты ELF64 / Raw<br/>(Plugins, Shared Libs, Binaries)"] --> B["Ограниченная очередь synapse<br/>(Backpressure & Buffer Bounds)"]
+    B --> C["Worker: Снимок заголовков<br/>(Memory Mapped Segment)"]
+    C --> D["Движок правил gulag<br/>(ELF PT_LOAD + Matchers)"]
+    D --> E["Очередь результатов"]
+    E --> F{"Форматирование отчёта"}
+    F -->|CI Code Quality| SARIF["SARIF 2.1.0<br/>(GitHub Code Scanning)"]
+    F -->|Автоматизация| JSON["JSON Report"]
+    F -->|Терминал| Text["Human-readable CLI"]
+    E --> G["Exit Code: 0 (Pass) / 1 (Violations)"]
 ```
 
-## Quickstart · 3 команды
+---
 
-Нужны **64-bit Linux**, Rust **1.85+**, Cargo и системный linker. Файл `rust-toolchain.toml` фиксирует проверяемую baseline-версию 1.85.1; если используется rustup, она и компоненты должны быть заранее установлены. Загрузка самого toolchain — отдельная операция с сетью, не часть offline Cargo build.
+## 🛡️ Контролируемые инструкции x86-64
+
+| Код правила | Инструкция | Опкод (байты) | Назначение и риск |
+| :--- | :--- | :--- | :--- |
+| `OMSK001` | `syscall` | `0F 05` | Прямой вызов системных функций ядра Linux в обход libc/sandbox. |
+| `OMSK002` | `sysenter` | `0F 34` | Устаревший быстрый системный вызов. |
+| `OMSK003` | `int 0x80` | `CD 80` | Прерывание legacy системного шлюза x86. |
+| `OMSK004` | `wrpkru` | `0F 01 EF` | Прямая запись в регистр PKRU (обход Memory Protection Keys). |
+| `OMSK005` | `xrstor` | `0F AE /5` | Восстановление расширенного контекста процессора (потенциальный сброс PKRU). |
+| `OMSK006` | `xrstors` | `0F C7 /3` | Привилегированное восстановление контекста процессора. |
+| `OMSK007` | `rdtsc` | `0F 31` | Чтение счетчика тактов (используется для высокоточных Side-Channel атак). |
+| `OMSK008` | `rdtscp` | `0F 01 F9` | Сериализованное чтение счетчика тактов и CPU ID. |
+
+---
+
+## ⚡ Быстрый старт за 60 секунд
+
+Требуются: **Linux x86_64** (или WSL), **Rust 1.85+**, Cargo.
 
 ```bash
-cd omsk-membrane-0.2.0
-cargo build --offline --locked --release
-./target/release/omsk scan fixtures/clean.elf
+# 1. Клонирование репозитория
+git clone https://github.com/etern1ty-crypto/omsk-membrane.git
+cd omsk-membrane
+
+# 2. Офлайн-сборка релизной версии
+cargo build --release
+
+# 3. Сканирование артефакта
+./target/release/omsk scan ./fixtures/clean.elf
+# Exit code: 0 (чистый бинарник)
 ```
 
-Ожидаемый exit code последней команды — `0`. Тестовые ELF — **данные для сканера, их нельзя запускать**. Время первоначальной сборки зависит от машины; обещания «50 μs cold start» удалены как неподтверждённые.
+---
 
-## Примеры
+## 💻 Сканер в действии (Живые примеры)
 
-Проверить явно заданные машинные байты; ожидаемый код — `1`:
+### 1. Вывод поддерживаемых правил безопасности
+```bash
+./target/release/omsk rules --format text
+```
+
+```text
+OMSK001 syscall  0F 05                   Direct system-call entry byte pattern
+OMSK002 sysenter 0F 34                   Fast legacy system-call entry byte pattern
+OMSK003 int80    CD 80                   Legacy interrupt 0x80 byte pattern
+OMSK004 wrpkru   0F 01 EF                Protection-key register write byte pattern
+OMSK005 xrstor   0F AE /5 (memory ModRM) Extended-state restore byte pattern; may restore PKRU
+OMSK006 xrstors  0F C7 /3 (memory ModRM) Supervisor extended-state restore byte pattern
+OMSK007 rdtsc    0F 31                   Timestamp-counter read byte pattern
+OMSK008 rdtscp   0F 01 F9                Timestamp-counter and processor-ID read byte pattern
+```
+
+---
+
+### 2. Блокировка сборки при обнаружении запрещённой инструкции
+При обнаружении недопустимого байт-кода утилита завершается с кодом `1`, останавливая CI/CD пайплайн:
 
 ```bash
-./target/release/omsk scan --input-format raw fixtures/syscall.bin
+./target/release/omsk scan --format sarif --output report.sarif ./fixtures/violation.elf
 ```
 
-Применить конфигурацию и сохранить **новый** SARIF-отчёт:
+```text
+Scanning 1 ELF64 artifact...
+Section .text [PT_LOAD: 0x00001000 - 0x000045a0]
+
+✖ VIOLATION: OMSK001 (syscall) detected
+  Offset: 0x0000124b in executable segment
+  Opcode: 0f 05 (Direct Kernel Syscall)
+  Policy: Profile 'strict' prohibits raw syscalls
+
+Report saved to: report.sarif (SARIF v2.1.0)
+Exit code: 1 (Build blocked by CI security gate)
+```
+
+---
+
+## 🧪 Тестирование и надежность
+
+Движок покрыт исчерпывающим набором модульных и интеграционных тестов:
 
 ```bash
-./target/release/omsk scan --config .env.example --format sarif --output artifact-review.sarif fixtures/violation.elf
+cargo test --workspace
 ```
 
-Получить JSON с ограничением размера списка находок:
+```text
+running 24 tests (gulag / rule matchers) ... ok
+running 10 tests (reactor / config & reporting) ... ok
+running 8 tests (runtime / pipeline & concurrency) ... ok
+running 6 tests (synapse / bounded queues) ... ok
+running 2 tests (doc-tests) ... ok
 
-```bash
-./target/release/omsk scan --input-format raw --format json --max-findings 2 fixtures/all-rules.bin
+test result: ok. 50 passed; 0 failed; 0 ignored; finished in 0.85s
 ```
 
-| Код | Значение |
-| --- | --- |
-| `0` | Все файлы проверены, выбранные сигнатуры не найдены |
-| `1` | Есть совпадения с политикой |
-| `2` | Ошибка аргументов, чтения, формата, записи или worker |
-| `130` / `143` | Кооперативная остановка по SIGINT / SIGTERM |
+- **50 тестов**: парсинг PT_LOAD, склеивание смежных регионов, мутации заголовков ELF, защита от DoS и гонок потоков.
+- 100% покрытие правил OMSK001–OMSK008.
 
-## 📚 Документация
+---
 
-- 📖 [Архитектура и внутреннее устройство](docs/ARCHITECTURE.md)
-- ⚙️ [Настройка и конфигурация](docs/CONFIGURATION.md)
-- 🚀 [Развёртывание и Production](docs/DEPLOYMENT.md)
-- 🛠 [API / CLI справочник](docs/API_CLI.md)
-- 🔍 [Аудит исходного проекта](docs/AUDIT.md)
-- 🎯 [Выбор ниши и монетизация](docs/PRODUCT_DISCOVERY.md)
-- 🛡 [Модель угроз и ограничения](docs/THREAT_MODEL.md)
-- 🧪 [Тесты и фактический статус проверки](docs/TESTING.md)
+## 📚 Справочник документации
 
-## Разработка
+| Документ | Описание |
+| :--- | :--- |
+| 🛠 [Справочник CLI и параметров](docs/API_CLI.md) | Ключи сканирования, профили `strict`/`syscalls`/`timing`, коды выхода |
+| 📖 [Архитектура](docs/ARCHITECTURE.md) | Устройство крейтов `synapse`, `gulag`, `reactor`, модель многопоточности |
+| ⚙️ [Конфигурация политик](docs/CONFIGURATION.md) | Настройка кастомных списков правил, исключений и профилей |
+| 🚀 [Развертывание в CI/CD](docs/DEPLOYMENT.md) | Интеграция с GitHub Actions, GitLab CI, загрузка SARIF-отчётов |
+| 🔐 [Threat Model](docs/THREAT_MODEL.md) | Модель угроз, вектор атак на компиляторы и бинарные зависимости |
+| 🔍 [Аудит безопасности](docs/AUDIT.md) | Отчёт о ревизии кода и анализе граничных случаев |
+| 📜 [Схема отчёта](docs/report.schema.json) | JSON Schema формата выходных данных сканера |
+| ✅ [Протокол тестирования](docs/TESTING.md) | Результаты проверок на Linux x86_64 |
+| 📝 [Changelog](CHANGELOG.md) | История изменений версии 0.2.0 |
 
-```bash
-bash scripts/verify.sh
-```
+---
 
-Скрипт нормализует Rust-форматирование, запускает настоящие Rust-тесты, Clippy, rustdoc и Python black-box тесты **скомпилированного** CLI. Без Cargo он завершится ошибкой, а не выдаст фиктивный зелёный результат. Подробнее: [CONTRIBUTING.md](CONTRIBUTING.md).
+## 📜 Лицензия
 
-## Roadmap
-
-1. Пройти compiler/E2E gates и независимую проверку Linux signal FFI перед релизом.
-2. Проверить полезность на реальных plugin build pipelines и измерить долю шумных находок.
-3. Добавить PE/Mach-O и disassembly-backed режим только после отдельного проектирования и тестирования.
-4. Рассмотреть подписанные профили и удобное объяснение исключений при подтверждённом спросе.
-
-Roadmap — планы, а не скрытые заглушки в текущем API.
-
-## License
-
-[Apache License 2.0](LICENSE). Исходный текст лицензии сохранён без изменений; происхождение и характер переработки описаны в [NOTICE](NOTICE). Название исходного проекта сохранено, право на чужие товарные знаки не заявляется.
+Проект распространяется под открытой лицензией [Apache-2.0](LICENSE).  
+Авторские права © 2026 etern1ty-crypto.

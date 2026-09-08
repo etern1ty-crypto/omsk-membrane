@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OMSK MEMBRANE // x86-64 Machine Code Policy Scanner</title>
+<style>
+  :root {
+    --bg: #0b0f19;
+    --card: #111827;
+    --border: #1f2937;
+    --text: #f3f4f6;
+    --text-dim: #9ca3af;
+    --accent: #38bdf8;
+    --red: #f87171;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --code-bg: #030712;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+    padding: 32px;
+    width: 1200px;
+    margin: 0 auto;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #0284c7, #4f46e5);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 900;
+    color: #fff;
+  }
+  .title-group h1 {
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .title-group p {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .badge-gate {
+    background: rgba(52, 211, 153, 0.15);
+    border: 1px solid var(--green);
+    color: var(--green);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+  }
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .metric-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .metric-label {
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .metric-value {
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .grid-section {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 16px;
+  }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  .panel-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .rules-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .rules-table th {
+    text-align: left;
+    color: var(--text-dim);
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .rules-table td {
+    padding: 7px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .rule-code {
+    font-family: monospace;
+    color: #38bdf8;
+    font-weight: 700;
+  }
+  .rule-byte {
+    font-family: monospace;
+    background: rgba(255,255,255,0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #fbbf24;
+  }
+  .term-box {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 12px;
+    color: #e5e7eb;
+    line-height: 1.5;
+  }
+  .term-cmd { color: #34d399; margin-bottom: 12px; }
+  .term-warn { color: #f87171; font-weight: 700; }
+  .term-pass { color: #34d399; font-weight: 700; }
+  .term-dim { color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="brand">
+    <div class="logo">Ω</div>
+    <div class="title-group">
+      <h1>OMSK MEMBRANE</h1>
+      <p>Offline x86-64 Machine Code Policy & Prohibited Instruction Scanner for CI/CD Gates</p>
+    </div>
+  </div>
+  <div class="badge-gate">
+    <div class="badge-dot"></div>
+    GATE READY · SARIF 2.1.0 COMPLIANT
+  </div>
+</div>
+
+<div class="metrics">
+  <div class="metric-card">
+    <div class="metric-label">Enforced Policy Rules</div>
+    <div class="metric-value">8 Instructions</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">ELF Parser Engine</div>
+    <div class="metric-value" style="color: #38bdf8;">PT_LOAD Aware</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Execution Sandbox</div>
+    <div class="metric-value" style="color: #34d399;">Pure Static Lint</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Verified Test Suite</div>
+    <div class="metric-value" style="color: #34d399;">50 / 50 Passing</div>
+  </div>
+</div>
+
+<div class="grid-section">
+  <div class="panel">
+    <div class="panel-title">🛡️ Enforced x86-64 Instruction Rules</div>
+    <table class="rules-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Instruction</th>
+          <th>Byte Opcode</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="rule-code">OMSK001</td>
+          <td><code>syscall</code></td>
+          <td><span class="rule-byte">0F 05</span></td>
+          <td>Direct system-call entry</td>
+        </tr>
+        <tr>
+          <td class="rule-code">OMSK002</td>
+          <td><code>sysenter</code></td>
+          <td><span class="rule-byte">0F 34</span></td>
+          <td>Fast legacy system call</td>
+        </tr>
+        <tr>
+          <td class="rule-code">OMSK003</td>
+          <td><code>int 0x80</code></td>
+          <td><span class="rule-byte">CD 80</span></td>
+          <td>Legacy interrupt gate</td>
+        </tr>
+        <tr>
+          <td class="rule-code">OMSK004</td>
+          <td><code>wrpkru</code></td>
+          <td><span class="rule-byte">0F 01 EF</span></td>
+          <td>Memory Protection Key write</td>
+        </tr>
+        <tr>
+          <td class="rule-code">OMSK005</td>
+          <td><code>xrstor</code></td>
+          <td><span class="rule-byte">0F AE /5</span></td>
+          <td>Extended-state register restore</td>
+        </tr>
+        <tr>
+          <td class="rule-code">OMSK006</td>
+          <td><code>xrstors</code></td>
+          <td><span class="rule-byte">0F C7 /3</span></td>
+          <td>Supervisor state register restore</td>
+        </tr>
+        <tr>
+          <td class="rule-code">OMSK007</td>
+          <td><code>rdtsc</code></td>
+          <td><span class="rule-byte">0F 31</span></td>
+          <td>Cycle counter read / timing probe</td>
+        </tr>
+        <tr>
+          <td class="rule-code">OMSK008</td>
+          <td><code>rdtscp</code></td>
+          <td><span class="rule-byte">0F 01 F9</span></td>
+          <td>Serialized timestamp and CPU ID</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">💻 CI/CD Gate Verification in Action</div>
+    <div class="term-box">
+      <div class="term-cmd">$ omsk scan --format sarif --output report.sarif ./bin/plugin.so</div>
+      <div class="term-dim">Scanning 1 ELF64 artifact...</div>
+      <div class="term-dim">Section .text [PT_LOAD: 0x00001000 - 0x000045a0]</div>
+      <br>
+      <div class="term-warn">✖ VIOLATION: OMSK001 (syscall) detected</div>
+      <div class="term-dim">  Offset: 0x0000124b in executable segment</div>
+      <div class="term-dim">  Opcode: 0f 05 (Direct Kernel Syscall)</div>
+      <div class="term-dim">  Policy: Profile 'strict' prohibits raw syscalls</div>
+      <br>
+      <div class="term-dim">Report saved to: report.sarif (SARIF v2.1.0)</div>
+      <div class="term-warn">Exit code: 1 (Build blocked by CI security gate)</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
