@@ -1,0 +1,8 @@
+OMSK Membrane
+
+This distribution is derived from the user-provided omsk-membrane-main archive.
+The original Apache License 2.0 text in LICENSE is retained without changes.
+Version 0.2.0 changes the prototype into a non-executing artifact policy scanner.
+The implementation, tests and documentation were substantially revised in 2026.
+No upstream ownership, trademark registration or additional rights are asserted.
+No registry-sourced Rust crates are included in this version.

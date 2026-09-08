@@ -1,0 +1,34 @@
+{
+  "scope": "offline static repository checks, NOT Rust compilation or CLI execution",
+  "checks": [
+    {
+      "name": "toml-and-local-only-lockfile",
+      "status": "passed"
+    },
+    {
+      "name": "rust-delimiters-and-format-braces-only",
+      "status": "passed",
+      "files": 14,
+      "format_strings": 66,
+      "is_compilation": false
+    },
+    {
+      "name": "python-syntax",
+      "status": "passed"
+    },
+    {
+      "name": "fixture-hashes-and-independent-expectations",
+      "status": "passed",
+      "fixtures": 12,
+      "reference_cases": 8,
+      "tests_rust_implementation": false
+    },
+    {
+      "name": "relative-documentation-links",
+      "status": "passed",
+      "links": 37
+    }
+  ],
+  "rust_test_functions_authored": 49,
+  "python_e2e_methods_authored": 16
+}

@@ -1,12 +1,19 @@
 [workspace]
-members = [
-    "synapse",
-    "gulag",
-    "reactor"
-]
+members = ["gulag", "synapse", "reactor"]
+default-members = ["reactor"]
 resolver = "2"
 
+[workspace.package]
+version = "0.2.0"
+edition = "2021"
+rust-version = "1.85"
+license = "Apache-2.0"
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
 [profile.release]
-lto = "fat"           # Link Time Optimization: MANDATORY.
-codegen-units = 1     # Slower compile, faster code.
-panic = "abort"       # No unwinding. If we fail, we die immediately.
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
+overflow-checks = true

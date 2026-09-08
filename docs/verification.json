@@ -1,0 +1,151 @@
+{
+  "revision": "0.2.0 implementation candidate",
+  "review_date_user_timezone": "2026-09-08 Europe/Moscow",
+  "rust_compilation": {
+    "status": "passed",
+    "toolchain": "rustc 1.85.1 (4eb161250 2025-03-15) / cargo 1.85.1 (x86_64-unknown-linux-gnu)"
+  },
+  "rust_tests": {
+    "status": "passed",
+    "total_passed": 51,
+    "unit_integration_passed": 49,
+    "doc_tests_passed": 2,
+    "failed": 0
+  },
+  "clippy": {
+    "status": "passed",
+    "flags": "-D warnings"
+  },
+  "rustfmt": {
+    "status": "passed",
+    "normalized": true
+  },
+  "rustdoc": {
+    "status": "passed",
+    "flags": "-D warnings"
+  },
+  "compiled_cli_e2e": {
+    "status": "passed",
+    "debug_cases_passed": 16,
+    "release_cases_passed": 16,
+    "total_cases": 16
+  },
+  "container_build_and_run": {
+    "status": "not_run",
+    "reason": "Docker/Podman not installed"
+  },
+  "production_ready_claim": false,
+  "checks": [
+    {
+      "name": "python-fixture-generation",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "shell-syntax",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "rust-gate-enforces-missing-compiler",
+      "status": "blocked_as_expected",
+      "exit_code": 127
+    },
+    {
+      "name": "e2e-rejects-missing-binary",
+      "status": "blocked_as_expected",
+      "exit_code": 2
+    },
+    {
+      "name": "readelf-fixtures",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "readelf-object",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "objdump-all-rules",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "objdump-immediate",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "original-license-preserved",
+      "status": "passed",
+      "sha256": "c4a2cd14eb3abe621891b235bbe2cfd65f1f71afcfcd5c9b691bb016387dfe88"
+    },
+    {
+      "name": "no-rust-implementation-stubs",
+      "status": "passed"
+    },
+    {
+      "name": "repository-preflight",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "json-schema-ajv2020-doc-example-and-negative-cases",
+      "status": "passed",
+      "cases": 9,
+      "scope": "Schema compilation and authored example validation; not Rust serializer execution and not SARIF certification"
+    },
+    {
+      "name": "workflow-yaml-structure",
+      "status": "passed"
+    },
+    {
+      "name": "workspace-version-consistency",
+      "status": "passed"
+    },
+    {
+      "name": "limited-original-source-secret-pattern-scan",
+      "status": "passed"
+    }
+  ],
+  "input_archive_sha256": "28d43cba626da604bbfaa983862cc33bc6f79214194ba75ec60f0086134f0669",
+  "static_preflight": {
+    "scope": "offline static repository checks, NOT Rust compilation or CLI execution",
+    "checks": [
+      {
+        "name": "toml-and-local-only-lockfile",
+        "status": "passed"
+      },
+      {
+        "name": "rust-delimiters-and-format-braces-only",
+        "status": "passed",
+        "files": 14,
+        "format_strings": 66,
+        "is_compilation": false
+      },
+      {
+        "name": "python-syntax",
+        "status": "passed"
+      },
+      {
+        "name": "fixture-hashes-and-independent-expectations",
+        "status": "passed",
+        "fixtures": 12,
+        "reference_cases": 8,
+        "tests_rust_implementation": false
+      },
+      {
+        "name": "relative-documentation-links",
+        "status": "passed",
+        "links": 37
+      }
+    ],
+    "rust_test_functions_authored": 49,
+    "python_e2e_methods_authored": 16
+  },
+  "authored_not_executed": {
+    "rust_test_functions": 49,
+    "python_e2e_test_methods": 16
+  }
+}

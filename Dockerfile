@@ -1,27 +1,16 @@
-# ИСПОЛЬЗУЕМ БАЗОВЫЙ СЛОЙ
-FROM rust:slim-bookworm
+FROM rust:1.85.1-slim-bookworm AS build
+WORKDIR /src
+COPY Cargo.toml Cargo.lock rust-toolchain.toml ./
+COPY gulag ./gulag
+COPY synapse ./synapse
+COPY reactor ./reactor
+COPY .env.example ./
+RUN cargo build --offline --locked --release -p reactor --bin omsk
 
-# УСТАНОВКА ИНСТРУМЕНТОВ "THE SILICA"
-# Clang и LLVM нужны для генерации привязок (bindgen) и анализа.
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    clang \
-    llvm-dev \
-    libclang-dev \
-    pkg-config \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
-# АКТИВАЦИЯ NIGHTLY-РЕЖИМА
-# OMSK требует доступа к нестабильным функциям CPU.
-RUN rustup toolchain install nightly && \
-    rustup default nightly && \
-    rustup component add rust-src
-
-# ПОДГОТОВКА РАБОЧЕЙ ЗОНЫ
-WORKDIR /usr/src/omsk
-COPY . .
-
-# КОМПИЛЯЦИЯ
-# Флаг --release обязателен. Debug-сборки недопустимы для Production.
-CMD ["cargo", "build", "--release"]
+FROM debian:bookworm-slim AS runtime
+RUN groupadd --gid 10001 omsk && useradd --uid 10001 --gid 10001 --no-create-home omsk
+COPY --from=build /src/target/release/omsk /usr/local/bin/omsk
+USER 10001:10001
+WORKDIR /work
+ENTRYPOINT ["/usr/local/bin/omsk"]
+CMD ["--help"]

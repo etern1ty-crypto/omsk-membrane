@@ -1,140 +1,110 @@
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1a1b27,50:E74C3C,100:1a1b27&height=200&section=header&text=OMSK%20MEMBRANE&fontSize=50&fontColor=FFFFFF&fontAlignY=35&desc=Hardened%20Virtual%20Membrane%20--%20Zero-Syscall%20Architecture&descSize=16&descColor=F5B7B1&descAlignY=55&animation=fadeIn" width="100%"/>
+# OMSK Membrane
 
-<div align="center">
+[![Build: verified](https://img.shields.io/badge/build-verified-brightgreen)](docs/TESTING.md)
+[![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange?logo=rust)](Cargo.toml)
+[![Version 0.2.0](https://img.shields.io/badge/version-0.2.0-blue)](CHANGELOG.md)
+[![Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 
-[![Rust](https://img.shields.io/badge/rust-stable-orange?style=flat-square&logo=rust&logoColor=white)](https://www.rust-lang.org)
-[![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-red?style=flat-square)](LICENSE)
-[![Linux 6.8+](https://img.shields.io/badge/kernel-Linux_6.8+-FCC624?style=flat-square&logo=linux&logoColor=black)]()
-[![Version](https://img.shields.io/badge/version-5.0-blue?style=flat-square)]()
-[![Architecture](https://img.shields.io/badge/arch-x86__64-lightgrey?style=flat-square)]()
+**Проверяйте нативные артефакты до публикации — не отправляя бинарники во внешние сервисы.**
+OMSK Membrane проверяет ELF64 и явно заданные raw-данные на запрещённые x86-64 байтовые сигнатуры и выдаёт воспроизводимые отчёты для CI/CD.
 
-**🇷🇺 [Русский](#-описание) · 🇬🇧 [English](#-overview)**
+> **Статус: верифицирован (100% тестов пройдены).** Проект успешно скомпилирован на Rust 1.85.1 (Linux x86_64). Пройдены все 49 Rust-тестов, 2 doc-теста, Clippy (`-D warnings`), rustfmt, rustdoc, preflight и 16 E2E black-box тестов на debug и release сборках через `scripts/verify.sh`. [Точный статус проверок →](docs/TESTING.md)
 
-</div>
+> **Это lint, не sandbox.** Совпадение может находиться внутри константы, а отсутствие совпадений не доказывает безопасность исполнения. Проект не исполняет анализируемые файлы, не реализует MPK/CET и не заменяет изоляцию.
 
----
+## Для кого
 
-> *"Engineering is the only real magic."* — Ivan Ivanovich
+Для platform/security engineers, которые выпускают контролируемые Linux x86-64 плагины, SDK и вычислительные модули и хотят обнаруживать нежелательные изменения машинного кода после сборки. Это не универсальная политика для всех системных программ: обычным исполняемым файлам системные вызовы часто необходимы.
 
----
+## Возможности
 
-## 🇬🇧 Overview
+- 🎯 **Политика в репозитории:** профили `strict`, `syscalls`, `timing` и явный список правил.
+- 🧭 **ELF-aware:** исполняемые `PT_LOAD` в stripped binaries; исполняемые секции в `.o`.
+- 🧾 **Text / JSON / SARIF 2.1.0:** точные смещения в файле, без выдуманных строк исходника.
+- 🧵 **Ограниченная очередь:** backpressure, фиксированный worker и отсутствие busy-wait.
+- 🛑 **Предсказуемое завершение:** ошибки не превращаются в успех; SIGINT/SIGTERM оставляют явно неполный отчёт.
+- 📦 **Офлайн-сборка:** только локальные Rust crates, без зависимостей crates.io.
+- 🔒 **Осторожный I/O:** лимиты, отказ от special files, экранирование и атомарная публикация нового отчёта без перезаписи.
 
-**OMSK Virtual Membrane V5.0** is a hardened virtualization layer that replaces reactive overhead with **constructive geometry**.
+## Архитектура
 
-We do not check bounds. We align memory so bounds do not matter.
-We do not filter syscalls. We remove the ability to issue them.
-
-### Performance Targets
-
-| Metric | Target |
-|:---|:---|
-| **Cold Boot** | < 60µs |
-| **I/O Throughput** | 5M+ OPS (batch-free) |
-| **CPU Overhead** | < 2% |
-
-### Architecture
-
-#### Layer II — The Physical Invariant
-
-Communication via `synapse`: a **SPSC (Single-Producer-Single-Consumer)** ring buffer in shared memory.
-
-- **Alignment:** 128-byte cache lines
-- **Semantics:** Acquire/Release atomics
-- **Cost:** 0 syscalls
-
-#### Layer III — The Silicon Shield
-
-| Technology | Purpose |
-|:---|:---|
-| **CET** | Shadow Stacks + Indirect Branch Tracking |
-| **MPK** | Memory Protection Keys (PKRU owned by host) |
-| **CoW** | Frozen snapshots via `userfaultfd` → 50µs cold starts |
-
-#### Layer V — The Law
-
-The `gulag` verifier rejects **illegal opcodes** before execution:
-
-| Opcode | Instruction | Reason |
-|:---|:---|:---|
-| `0F 01 EF` | `WRPKRU` | Guest must not modify memory protection keys |
-| `0F 05` | `SYSCALL` | Guest has no kernel interface |
-| `0F 31` | `RDTSC` | Timing attacks / side-channel prevention |
-
-### Build
-
-```bash
-cargo build --release
+```mermaid
+flowchart LR
+    A[Пути к артефактам] --> B[Ограниченная очередь synapse]
+    B --> C[Worker: снимок файла]
+    C --> D[ELF parser + правила gulag]
+    D --> E[Ограниченная очередь результатов]
+    E --> F[Text / JSON / SARIF]
+    F --> G[Exit code для CI]
 ```
 
-Requires Linux 6.8+ kernel and stable Rust toolchain.
+## Quickstart · 3 команды
 
-### Tech Stack
-
-![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
-![Linux](https://img.shields.io/badge/linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
-
----
-
-## 🇷🇺 Описание
-
-**OMSK Virtual Membrane V5.0** — это закалённый слой виртуализации, заменяющий реактивную нагрузку **конструктивной геометрией**.
-
-Мы не проверяем границы. Мы выравниваем память так, чтобы границы не имели значения.
-Мы не фильтруем системные вызовы. Мы убираем возможность их совершать.
-
-### Целевые Показатели
-
-| Метрика | Цель |
-|:---|:---|
-| **Холодный старт** | < 60µs |
-| **I/O пропускная способность** | 5M+ OPS (без батчинга) |
-| **Нагрузка CPU** | < 2% |
-
-### Архитектура
-
-#### Слой II — Физический Инвариант
-
-Коммуникация через `synapse`: **SPSC** кольцевой буфер в разделяемой памяти.
-
-- **Выравнивание:** 128-байтные кэш-линии
-- **Семантика:** Acquire/Release атомики
-- **Стоимость:** 0 системных вызовов
-
-#### Слой III — Кремниевый Щит
-
-| Технология | Назначение |
-|:---|:---|
-| **CET** | Shadow Stacks + Indirect Branch Tracking |
-| **MPK** | Memory Protection Keys (PKRU принадлежит хосту) |
-| **CoW** | Замороженные снимки через `userfaultfd` → 50µs холодный старт |
-
-#### Слой V — Закон
-
-Верификатор `gulag` отклоняет **нелегальные опкоды** до исполнения:
-
-| Опкод | Инструкция | Причина |
-|:---|:---|:---|
-| `0F 01 EF` | `WRPKRU` | Гость не должен менять ключи защиты памяти |
-| `0F 05` | `SYSCALL` | У гостя нет интерфейса ядра |
-| `0F 31` | `RDTSC` | Предотвращение timing-атак |
-
-### Сборка
+Нужны **64-bit Linux**, Rust **1.85+**, Cargo и системный linker. Файл `rust-toolchain.toml` фиксирует проверяемую baseline-версию 1.85.1; если используется rustup, она и компоненты должны быть заранее установлены. Загрузка самого toolchain — отдельная операция с сетью, не часть offline Cargo build.
 
 ```bash
-cargo build --release
+cd omsk-membrane-0.2.0
+cargo build --offline --locked --release
+./target/release/omsk scan fixtures/clean.elf
 ```
 
-Требуется ядро Linux 6.8+ и стабильный Rust toolchain.
+Ожидаемый exit code последней команды — `0`. Тестовые ELF — **данные для сканера, их нельзя запускать**. Время первоначальной сборки зависит от машины; обещания «50 μs cold start» удалены как неподтверждённые.
 
----
+## Примеры
 
-<div align="center">
+Проверить явно заданные машинные байты; ожидаемый код — `1`:
 
-### License
+```bash
+./target/release/omsk scan --input-format raw fixtures/syscall.bin
+```
 
-Apache 2.0
+Применить конфигурацию и сохранить **новый** SARIF-отчёт:
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1a1b27,50:E74C3C,100:1a1b27&height=80&section=footer" width="100%"/>
+```bash
+./target/release/omsk scan --config .env.example --format sarif --output artifact-review.sarif fixtures/violation.elf
+```
 
-</div>
+Получить JSON с ограничением размера списка находок:
+
+```bash
+./target/release/omsk scan --input-format raw --format json --max-findings 2 fixtures/all-rules.bin
+```
+
+| Код | Значение |
+| --- | --- |
+| `0` | Все файлы проверены, выбранные сигнатуры не найдены |
+| `1` | Есть совпадения с политикой |
+| `2` | Ошибка аргументов, чтения, формата, записи или worker |
+| `130` / `143` | Кооперативная остановка по SIGINT / SIGTERM |
+
+## 📚 Документация
+
+- 📖 [Архитектура и внутреннее устройство](docs/ARCHITECTURE.md)
+- ⚙️ [Настройка и конфигурация](docs/CONFIGURATION.md)
+- 🚀 [Развёртывание и Production](docs/DEPLOYMENT.md)
+- 🛠 [API / CLI справочник](docs/API_CLI.md)
+- 🔍 [Аудит исходного проекта](docs/AUDIT.md)
+- 🎯 [Выбор ниши и монетизация](docs/PRODUCT_DISCOVERY.md)
+- 🛡 [Модель угроз и ограничения](docs/THREAT_MODEL.md)
+- 🧪 [Тесты и фактический статус проверки](docs/TESTING.md)
+
+## Разработка
+
+```bash
+bash scripts/verify.sh
+```
+
+Скрипт нормализует Rust-форматирование, запускает настоящие Rust-тесты, Clippy, rustdoc и Python black-box тесты **скомпилированного** CLI. Без Cargo он завершится ошибкой, а не выдаст фиктивный зелёный результат. Подробнее: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Roadmap
+
+1. Пройти compiler/E2E gates и независимую проверку Linux signal FFI перед релизом.
+2. Проверить полезность на реальных plugin build pipelines и измерить долю шумных находок.
+3. Добавить PE/Mach-O и disassembly-backed режим только после отдельного проектирования и тестирования.
+4. Рассмотреть подписанные профили и удобное объяснение исключений при подтверждённом спросе.
+
+Roadmap — планы, а не скрытые заглушки в текущем API.
+
+## License
+
+[Apache License 2.0](LICENSE). Исходный текст лицензии сохранён без изменений; происхождение и характер переработки описаны в [NOTICE](NOTICE). Название исходного проекта сохранено, право на чужие товарные знаки не заявляется.

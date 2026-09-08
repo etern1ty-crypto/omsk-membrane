@@ -1,0 +1,98 @@
+[
+  {
+    "path": ".gitignore",
+    "bytes": 96,
+    "lines": 9,
+    "sha256": "df32519276f04f00b05d0deff324d165552fda9aa510bdf0b092f39bc7b29adb"
+  },
+  {
+    "path": "Cargo.lock",
+    "bytes": 716,
+    "lines": 36,
+    "sha256": "48542287e506edc1f8c0b492f1c39964248f11e9a0eb2a29f3875557f10ecb33"
+  },
+  {
+    "path": "Cargo.toml",
+    "bytes": 284,
+    "lines": 12,
+    "sha256": "306c8be85b8fae2806de43e8a9c7f951d20da518491b6e0fbfe3656d77b0067a"
+  },
+  {
+    "path": "Dockerfile",
+    "bytes": 883,
+    "lines": 27,
+    "sha256": "4ebf09389c73f92a2b08add9d0c58696682ad38f7c2264fae9172ae0a8bc085a"
+  },
+  {
+    "path": "LICENSE",
+    "bytes": 10173,
+    "lines": 176,
+    "sha256": "c4a2cd14eb3abe621891b235bbe2cfd65f1f71afcfcd5c9b691bb016387dfe88"
+  },
+  {
+    "path": "README.md",
+    "bytes": 5042,
+    "lines": 140,
+    "sha256": "e4779eccef7e5a4c4234f0e23a69cf2be948168c14d8054978a1dcaade2a243a"
+  },
+  {
+    "path": "gulag/Cargo.toml",
+    "bytes": 76,
+    "lines": 6,
+    "sha256": "769a68d2f0a62e9c5f08609b62fd01c62da346f8da71be13b2878e769021b755"
+  },
+  {
+    "path": "gulag/src/lib.rs",
+    "bytes": 1881,
+    "lines": 75,
+    "sha256": "f8444dd24554863cf3fa2bcc4d831e04ec34e86956d22ba2e2cbc5e86ac7c3fb"
+  },
+  {
+    "path": "gulag/tests/audit.rs",
+    "bytes": 860,
+    "lines": 30,
+    "sha256": "63d334a7c716cc4af9ba0c609a196399dd780dac9489145eade4be3e088e3185"
+  },
+  {
+    "path": "reactor/Cargo.toml",
+    "bytes": 172,
+    "lines": 11,
+    "sha256": "4552f69a392b32a1055395a9b4eb3f44b7ac44bdd6b616b5d9d2dd0d73394c2c"
+  },
+  {
+    "path": "reactor/src/guest.rs",
+    "bytes": 441,
+    "lines": 24,
+    "sha256": "9c76cb6a2ce37a1732bf818ec628106e9d70486d719be42ecab544370e964bb4"
+  },
+  {
+    "path": "reactor/src/io_pump.rs",
+    "bytes": 1642,
+    "lines": 52,
+    "sha256": "6399a9770ceede09813167791245a2b07927fd3aeadac9ec907cd193031357a2"
+  },
+  {
+    "path": "reactor/src/main.rs",
+    "bytes": 665,
+    "lines": 27,
+    "sha256": "64617c8bd8723c81473f43645f436b0570adafdd104f053270fff451c7adde05"
+  },
+  {
+    "path": "synapse/Cargo.toml",
+    "bytes": 78,
+    "lines": 6,
+    "sha256": "24196012e265b37c7b3fe7f939a2f3723b8d86cb6851ca5bf4a8fbda67d508df"
+  },
+  {
+    "path": "synapse/src/lib.rs",
+    "bytes": 641,
+    "lines": 26,
+    "sha256": "8c8dac28ad8b55de80f3cfb80b8cd1ca1f785aa4f93ec3b9eb33a37328bbac4a"
+  },
+  {
+    "path": "task.md",
+    "bytes": 585,
+    "lines": 13,
+    "sha256": "be624fe29c47e626cdbaee3a30bf7a51f98a295cf1cfeaf84f9d30c83620e804"
+  }
+]

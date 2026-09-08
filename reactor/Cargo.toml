@@ -1,11 +1,19 @@
 [package]
 name = "reactor"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "OMSK Membrane offline artifact policy gate"
+publish = false
+
+[[bin]]
+name = "omsk"
+path = "src/main.rs"
 
 [dependencies]
-synapse = { path = "../synapse" }
 gulag = { path = "../gulag" }
-libc = "0.2"
-memmap2 = "0.9"
+synapse = { path = "../synapse" }
 
+[lints]
+workspace = true

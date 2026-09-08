@@ -1,0 +1,86 @@
+{
+  "all-rules.bin": {
+    "bytes": 27,
+    "expected_exit": 1,
+    "expected_matches": 8,
+    "input_format": "raw",
+    "sha256": "62a5fea303a6f9d6dfd247d14a37b3dd6973dd3d116c1ebc1864b59d36e77976"
+  },
+  "clean.bin": {
+    "bytes": 3,
+    "expected_exit": 0,
+    "expected_matches": 0,
+    "input_format": "raw",
+    "sha256": "39be667df5c9e6069f69c26d1d7923c4939ad24c9fe2a1b10037b322be4421b3"
+  },
+  "clean.elf": {
+    "bytes": 131,
+    "expected_exit": 0,
+    "expected_matches": 0,
+    "input_format": "auto",
+    "sha256": "68161d4ba281f4ee6e93dada44e2b61edbc3fe9f6e422e256b7bfe6b537c4395"
+  },
+  "data-only-pattern.elf": {
+    "bytes": 132,
+    "expected_exit": 0,
+    "expected_matches": 0,
+    "input_format": "auto",
+    "sha256": "c93f94cfecafc8e58dd77ab47807ce1e8e93de5d80663a8c8b7544ec11c81e3a"
+  },
+  "empty.bin": {
+    "bytes": 0,
+    "expected_exit": 2,
+    "expected_matches": null,
+    "input_format": "raw",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "immediate.bin": {
+    "bytes": 6,
+    "expected_exit": 1,
+    "expected_matches": 1,
+    "input_format": "raw",
+    "sha256": "313917b9a6880bfae20940b55b4e4bed9f152647e6998756315b99f9910d219e"
+  },
+  "nonexec.elf": {
+    "bytes": 130,
+    "expected_exit": 2,
+    "expected_matches": null,
+    "input_format": "auto",
+    "sha256": "0ab389ea7356d16d35e71c379836058a0e73deca503d20feb12db460cbd6cbed"
+  },
+  "syscall.bin": {
+    "bytes": 4,
+    "expected_exit": 1,
+    "expected_matches": 1,
+    "input_format": "raw",
+    "sha256": "22d86850156be5bc7e4eaa18d58d8d47ccc13ec6cfc03a89a554333922238928"
+  },
+  "truncated.elf": {
+    "bytes": 6,
+    "expected_exit": 2,
+    "expected_matches": null,
+    "input_format": "auto",
+    "sha256": "786d95ff4308ec8ee6ce17efdaa94531800558a865f1db5c979a86d4b651fd51"
+  },
+  "unknown.bin": {
+    "bytes": 19,
+    "expected_exit": 2,
+    "expected_matches": null,
+    "input_format": "auto",
+    "sha256": "9dc728fe645a4b88fae96938a1e832e89de6dcc0db13791ffe63487e5f60adc3"
+  },
+  "violation.elf": {
+    "bytes": 132,
+    "expected_exit": 1,
+    "expected_matches": 1,
+    "input_format": "auto",
+    "sha256": "1bc938f0e208cfc9250d960e4cac933cdf8b96f3009abdf8ee245d76a453fe62"
+  },
+  "violation.o": {
+    "bytes": 195,
+    "expected_exit": 1,
+    "expected_matches": 1,
+    "input_format": "auto",
+    "sha256": "00134b9e6acfbd89ff93c7e5cad0e2d7b762b813ec3a5f982260e507605ef5b2"
+  }
+}

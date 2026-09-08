@@ -1,6 +1,11 @@
 [package]
 name = "gulag"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Bounded x86-64 byte-pattern analysis for ELF artifacts"
+publish = false
 
-[dependencies]
+[lints]
+workspace = true

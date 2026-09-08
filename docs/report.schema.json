@@ -1,0 +1,314 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OMSK Membrane JSON report v1",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "tool": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "const": "omsk"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "analysis": {
+      "const": "byte-pattern-lint"
+    },
+    "input_format": {
+      "enum": [
+        "auto",
+        "elf",
+        "raw"
+      ]
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "enum": [
+            "strict",
+            "syscalls",
+            "timing",
+            "custom"
+          ]
+        },
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "syscall",
+              "sysenter",
+              "int80",
+              "wrpkru",
+              "xrstor",
+              "xrstors",
+              "rdtsc",
+              "rdtscp"
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "rules"
+      ],
+      "additionalProperties": false
+    },
+    "files": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/fileSuccess"
+          },
+          {
+            "$ref": "#/$defs/fileFailure"
+          }
+        ]
+      }
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "exit_code": {
+      "enum": [
+        0,
+        1,
+        2,
+        130,
+        143
+      ]
+    },
+    "engine_error": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "tool",
+    "analysis",
+    "input_format",
+    "policy",
+    "files",
+    "summary",
+    "complete",
+    "exit_code",
+    "engine_error"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "properties": {
+        "rule_id": {
+          "enum": [
+            "OMSK001",
+            "OMSK002",
+            "OMSK003",
+            "OMSK004",
+            "OMSK005",
+            "OMSK006",
+            "OMSK007",
+            "OMSK008"
+          ]
+        },
+        "rule": {
+          "enum": [
+            "syscall",
+            "sysenter",
+            "int80",
+            "wrpkru",
+            "xrstor",
+            "xrstors",
+            "rdtsc",
+            "rdtscp"
+          ]
+        },
+        "file_offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "byte_length": {
+          "enum": [
+            2,
+            3
+          ]
+        },
+        "virtual_address": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^0x[0-9a-f]{1,16}$"
+        },
+        "region": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "rule_id",
+        "rule",
+        "file_offset",
+        "byte_length",
+        "virtual_address",
+        "region"
+      ],
+      "additionalProperties": false
+    },
+    "fileSuccess": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "clean",
+            "violations"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "raw",
+            "elf64-executable",
+            "elf64-shared",
+            "elf64-object"
+          ]
+        },
+        "file_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scanned_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "region_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4096
+        },
+        "total_findings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "omitted_findings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "findings": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        }
+      },
+      "required": [
+        "path",
+        "status",
+        "kind",
+        "file_bytes",
+        "scanned_bytes",
+        "region_count",
+        "total_findings",
+        "omitted_findings",
+        "findings"
+      ],
+      "additionalProperties": false
+    },
+    "fileFailure": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "error",
+            "cancelled"
+          ]
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "status",
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "requested": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "completed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "clean": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "violating": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cancelled": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_findings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reported_findings": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "requested",
+        "completed",
+        "clean",
+        "violating",
+        "errors",
+        "cancelled",
+        "total_findings",
+        "reported_findings"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
